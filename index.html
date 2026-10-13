@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alles Gute zum Geburtstag, Anne-Sophie! 🏊‍♀️🐬🎂</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Montserrat:wght@300;400;600;700;800&family=Playfair+Display:ital,wght@0,600;0,800;1,400&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        teal: { 400: '#2dd4bf', 500: '#14b8a6', 600: '#0d9488', 800: '#115e59' },
+                        ocean: { dark: '#02182b', deep: '#002845', mid: '#006494', light: '#00a6fb', bright: '#05d9e8' },
+                        coral: { DEFAULT: '#ff6b6b', soft: '#ff8e8e', dark: '#ee5253' },
+                        gold: { DEFAULT: '#ffd700', light: '#ffec99' }
+                    },
+                    fontFamily: {
+                        serif: ['Playfair Display', 'serif'],
+                        sans: ['Montserrat', 'sans-serif'],
+                        handwriting: ['Caveat', 'cursive']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #02182b 0%, #002845 40%, #006494 80%, #0d9488 100%);
+            overflow-x: hidden;
+            min-height: 100vh;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .glass-card {
+            background: rgba(2, 24, 43, 0.88);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        @keyframes swimPulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(5, 217, 232, 0.6); }
+            50% { transform: scale(1.06); box-shadow: 0 0 32px rgba(5, 217, 232, 0.9); }
+        }
+        .swim-btn-pulse {
+            animation: swimPulse 1.8s infinite ease-in-out;
+        }
+
+        canvas {
+            display: block;
+            touch-action: manipulation;
+        }
+    </style>
+</head>
+<body class="text-slate-100 flex flex-col justify-between relative min-h-screen">
+
+    <!-- Header Section -->
+    <header class="w-full max-w-5xl mx-auto px-4 pt-6 pb-2 text-center relative z-10">
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-teal-500/20 border border-teal-300/30 backdrop-blur-md mb-3">
+            <i class="fa-solid fa-water text-ocean-bright animate-bounce"></i>
+            <span class="text-xs sm:text-sm font-semibold tracking-wider text-teal-200 uppercase">In deinem Element</span>
+        </div>
+        <h1 class="font-serif text-3xl sm:text-5xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-teal-200 via-cyan-100 to-amber-200 tracking-tight">
+            Alles Gute zum Geburtstag, Anne-Sophie!
+        </h1>
+        <p class="font-handwriting text-2xl sm:text-3xl text-amber-300 mt-2">
+            Schwimme deinen Träumen entgegen und genieße deinen Tag! ✨
+        </p>
+    </header>
+
+    <!-- Interactive Main Canvas Container -->
+    <main class="w-full max-w-4xl mx-auto px-4 my-4 relative z-20 flex-grow flex flex-col items-center justify-center">
+        <div class="glass-card rounded-3xl p-4 sm:p-6 w-full text-center relative overflow-hidden border-t-2 border-teal-300/40">
+            
+            <!-- Instructions & Distance Meter -->
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-2 mb-3 px-2">
+                <div class="text-xs sm:text-sm font-medium text-slate-300 flex items-center gap-2">
+                    <i class="fa-solid fa-hand-pointer text-ocean-bright animate-pulse"></i>
+                    <span>Klicke auf das Wasser, um Anne-Sophie schwimmen zu lassen!</span>
+                </div>
+                
+                <!-- Distance Display (Countdown from 10,000m) -->
+                <div class="flex items-center gap-2 w-full sm:w-auto">
+                    <span class="text-xs sm:text-sm text-teal-300 font-bold whitespace-nowrap">Ziel-Distanz:</span>
+                    <div class="bg-slate-900/90 border border-teal-400/50 px-3 py-1 rounded-lg text-amber-300 font-extrabold text-sm sm:text-base min-w-[90px] text-center shadow-inner">
+                        <span id="distanceText">10.000 m</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Swimming Pool Canvas Area -->
+            <div class="relative w-full aspect-[2/1] sm:aspect-[2.4/1] rounded-2xl overflow-hidden border border-teal-400/30 bg-slate-950 shadow-inner cursor-pointer" id="canvasContainer">
+                <canvas id="swimCanvas" class="w-full h-full"></canvas>
+                
+                <!-- Victory Celebration Overlay -->
+                <div id="victoryOverlay" class="absolute inset-0 bg-slate-950/75 backdrop-blur-md flex flex-col items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-700 z-30">
+                    <div class="transform scale-90 transition-transform duration-500 text-center max-w-lg" id="victoryBox">
+                        <span class="text-5xl sm:text-7xl mb-2 block animate-bounce">🐬🎂🎆</span>
+                        <h2 class="font-serif text-2xl sm:text-4xl font-extrabold text-amber-200 drop-shadow-lg">
+                            Alles Gute zum Geburtstag, liebe Anne-Sophie!
+                        </h2>
+                        <p class="font-handwriting text-2xl sm:text-3xl text-teal-200 mt-3 mb-6">
+                            Du hast 10.000m geschafft und deine Torte erreicht!
+                        </p>
+                        
+                        <!-- Reset Action -->
+                        <div class="flex justify-center">
+                            <button onclick="resetSwimGame(event)" class="px-8 py-3 bg-gradient-to-r from-teal-400 to-ocean-bright hover:from-teal-300 hover:to-cyan-300 text-slate-950 font-extrabold rounded-full shadow-xl transform hover:scale-105 active:scale-95 transition flex items-center gap-2 text-base">
+                                <i class="fa-solid fa-rotate-left"></i>
+                                <span>Nochmal schwimmen!</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Swimming Action Button -->
+            <div class="mt-4 flex flex-wrap justify-center gap-4 items-center">
+                <button id="swimBtn" onclick="handleSwimClick(event)" class="swim-btn-pulse px-8 py-3.5 bg-gradient-to-r from-teal-400 via-cyan-400 to-ocean-bright hover:from-teal-300 hover:to-cyan-300 text-slate-950 font-extrabold text-base sm:text-lg rounded-full shadow-lg transition transform active:scale-95 flex items-center gap-3">
+                    <i class="fa-solid fa-person-swimming text-xl"></i>
+                    <span>Klicken zum Schwimmen!</span>
+                </button>
+                <button onclick="resetSwimGame(event)" class="px-5 py-3 bg-slate-800/80 hover:bg-slate-700/80 text-teal-200 font-semibold text-sm rounded-full border border-teal-500/30 transition flex items-center gap-2">
+                    <i class="fa-solid fa-arrow-rotate-left"></i>
+                    <span>Neustart</span>
+                </button>
+            </div>
+
+            <!-- Warm German Birthday Message -->
+            <div class="mt-8 pt-6 border-t border-teal-500/20 text-left sm:text-center max-w-2xl mx-auto space-y-3">
+                <p class="text-sm sm:text-base text-slate-200 leading-relaxed">
+                    Liebe <span class="font-bold text-amber-200">Anne-Sophie</span>,
+                </p>
+                <p class="text-sm sm:text-base text-slate-300 leading-relaxed">
+                    wir wünschen dir von Herzen alles erdenklich Gute zu deinem Geburtstag! Bleib genau so lebensfroh, voller Schwung und voller Energie. Mögest du im kommenden Lebensjahr stets mit Leichtigkeit durch alle Wellen des Lebens gleiten, jeden Zug genießen und immer Rückenwind haben.
+                </p>
+                <p class="font-handwriting text-2xl text-teal-300 pt-2">
+                    Auf ein fantastisches neues Lebensjahr im perfekten Element! 🌊💙✨
+                </p>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-4 text-center text-xs text-teal-200/60 relative z-10">
+        Mit Liebe für Anne-Sophie kreiert • Ein persönliches Geburtstags-Schwimmevent
+    </footer>
+
+    <script>
+        const canvas = document.getElementById('swimCanvas');
+        const ctx = canvas.getContext('2d');
+        const container = document.getElementById('canvasContainer');
+        const distanceText = document.getElementById('distanceText');
+        const victoryOverlay = document.getElementById('victoryOverlay');
+        const victoryBox = document.getElementById('victoryBox');
+
+        let width = 0;
+        let height = 0;
+
+        let progress = 0; // Current smooth progress (0 to 1)
+        let targetProgress = 0; // Targeted progress on user click
+        let isFinished = false;
+        let strokePhase = 0;
+        let waveOffset = 0;
+        let fireworkTimer = null;
+
+        // Dynamic Elements
+        let dolphins = [];
+        let splashes = [];
+        let fireworks = [];
+        let fireworkSparks = [];
+        let waterRipples = [];
+        let confetti = [];
+
+        /* --- Audio Synthesis (Web Audio API) --- */
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (AudioContext) audioCtx = new AudioContext();
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playSplashSound() {
+            initAudio();
+            if (!audioCtx) return;
+            try {
+                const bufferSize = audioCtx.sampleRate * 0.15;
+                const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.3));
+                }
+                const noise = audioCtx.createBufferSource();
+                noise.buffer = buffer;
+
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = 'bandpass';
+                filter.frequency.setValueAtTime(600 + Math.random() * 500, audioCtx.currentTime);
+
+                const gain = audioCtx.createGain();
+                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+
+                noise.connect(filter);
+                filter.connect(gain);
+                gain.connect(audioCtx.destination);
+                noise.start();
+            } catch (e) { console.error(e); }
+        }
+
+        function playCelebrationSound() {
+            initAudio();
+            if (!audioCtx) return;
+            try {
+                const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51, 1567.98];
+                notes.forEach((freq, idx) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(freq, audioCtx.currentTime + idx * 0.08);
+
+                    gain.gain.setValueAtTime(0, audioCtx.currentTime + idx * 0.08);
+                    gain.gain.linearRampToValueAtTime(0.2, audioCtx.currentTime + idx * 0.08 + 0.05);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + idx * 0.08 + 0.9);
+
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(audioCtx.currentTime + idx * 0.08);
+                    osc.stop(audioCtx.currentTime + idx * 0.08 + 0.9);
+                });
+            } catch (e) { console.error(e); }
+        }
+
+        function resizeCanvas() {
+            width = container.clientWidth;
+            height = container.clientHeight;
+            canvas.width = width;
+            canvas.height = height;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function handleSwimClick(e) {
+            if (e) e.stopPropagation();
+            if (isFinished) return;
+
+            // Advance progress (~10 clicks to reach target)
+            targetProgress = Math.min(1, targetProgress + 0.095);
+
+            const startX = width * 0.15;
+            const endX = width * 0.76;
+            const currentX = startX + (endX - startX) * progress;
+            const laneY = height * 0.52;
+
+            createSplash(currentX, laneY);
+            createRipple(currentX, laneY);
+            playSplashSound();
+
+            // Chance to spawn jumping dolphin on swim click
+            if (Math.random() < 0.6) {
+                spawnDolphin();
+            }
+        }
+
+        container.addEventListener('click', handleSwimClick);
+
+        function resetSwimGame(e) {
+            if (e) e.stopPropagation();
+            if (fireworkTimer) clearInterval(fireworkTimer);
+            progress = 0;
+            targetProgress = 0;
+            isFinished = false;
+            splashes = [];
+            fireworks = [];
+            fireworkSparks = [];
+            dolphins = [];
+            confetti = [];
+            
+            distanceText.innerText = '10.000 m';
+            
+            victoryOverlay.classList.add('opacity-0', 'pointer-events-none');
+            victoryBox.classList.add('scale-90');
+        }
+
+        function spawnDolphin() {
+            const startX = width * (0.1 + Math.random() * 0.5);
+            dolphins.push({
+                startX: startX,
+                x: startX,
+                jumpWidth: 120 + Math.random() * 80,
+                jumpHeight: 60 + Math.random() * 40,
+                progress: 0,
+                speed: 0.02 + Math.random() * 0.015,
+                yBase: height * (0.45 + Math.random() * 0.15),
+                size: 24 + Math.random() * 8
+            });
+        }
+
+        function drawDolphins() {
+            for (let i = dolphins.length - 1; i >= 0; i--) {
+                const d = dolphins[i];
+                d.progress += d.speed;
+                
+                d.x = d.startX + d.progress * d.jumpWidth;
+                const arcY = Math.sin(d.progress * Math.PI) * d.jumpHeight;
+                const y = d.yBase - arcY;
+                const angle = Math.cos(d.progress * Math.PI) * -0.6;
+
+                // Splash on entry and exit
+                if (d.progress > 0.02 && d.progress < 0.05 && Math.random() < 0.3) {
+                    createSplash(d.x, d.yBase);
+                } else if (d.progress > 0.95 && d.progress < 0.98 && Math.random() < 0.3) {
+                    createSplash(d.x, d.yBase);
+                }
+
+                ctx.save();
+                ctx.translate(d.x, y);
+                ctx.rotate(angle);
+
+                // Dolphin Body
+                ctx.fillStyle = '#0ea5e9';
+                ctx.beginPath();
+                ctx.ellipse(0, 0, d.size, d.size * 0.4, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Dolphin Belly
+                ctx.fillStyle = '#e0f2fe';
+                ctx.beginPath();
+                ctx.ellipse(0, d.size * 0.1, d.size * 0.8, d.size * 0.25, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Snout / Beak
+                ctx.fillStyle = '#0ea5e9';
+                ctx.beginPath();
+                ctx.moveTo(d.size * 0.8, -d.size * 0.1);
+                ctx.lineTo(d.size * 1.3, d.size * 0.1);
+                ctx.lineTo(d.size * 0.7, d.size * 0.2);
+                ctx.closePath();
+                ctx.fill();
+
+                // Dorsal Fin
+                ctx.beginPath();
+                ctx.moveTo(-d.size * 0.1, -d.size * 0.35);
+                ctx.quadraticCurveTo(-d.size * 0.5, -d.size * 0.9, -d.size * 0.6, -d.size * 0.35);
+                ctx.closePath();
+                ctx.fill();
+
+                // Tail Fluke
+                ctx.beginPath();
+                ctx.moveTo(-d.size * 0.9, 0);
+                ctx.lineTo(-d.size * 1.3, -d.size * 0.4);
+                ctx.lineTo(-d.size * 1.1, 0);
+                ctx.lineTo(-d.size * 1.3, d.size * 0.4);
+                ctx.closePath();
+                ctx.fill();
+
+                // Eye
+                ctx.fillStyle = '#0f172a';
+                ctx.beginPath();
+                ctx.arc(d.size * 0.6, -d.size * 0.1, 1.5, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.restore();
+
+                if (d.progress >= 1) {
+                    dolphins.splice(i, 1);
+                }
+            }
+        }
+
+        function launchSingleBurst(startX, startY, targetX, targetY, colors) {
+            const chosenColor = colors[Math.floor(Math.random() * colors.length)];
+            fireworks.push({
+                x: startX,
+                y: startY,
+                targetX: targetX,
+                targetY: targetY,
+                vx: (targetX - startX) * 0.035,
+                vy: (targetY - startY) * 0.035,
+                color: chosenColor,
+                exploded: false
+            });
+        }
+
+        function createBurstParticles(x, y, color) {
+            // MASSIVE SPECTACULAR FIREWORKS
+            const particleCount = 160 + Math.floor(Math.random() * 80);
+            const baseSpeed = 6 + Math.random() * 8;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * baseSpeed + 1.5;
+                fireworkSparks.push({
+                    x: x,
+                    y: y,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed,
+                    radius: Math.random() * 3.5 + 2,
+                    alpha: 1,
+                    decay: Math.random() * 0.015 + 0.006,
+                    color: color,
+                    gravity: 0.06,
+                    sparkle: Math.random() > 0.3
+                });
+            }
+        }
+
+        function triggerVictoryFireworks() {
+            isFinished = true;
+            playCelebrationSound();
+
+            const colors = ['#ffd700', '#ff6b6b', '#2dd4bf', '#05d9e8', '#ffffff', '#ff8e8e', '#facc15', '#e0e7ff', '#f472b6', '#a855f7'];
+
+            // MASSIVE continuous barrage of fireworks
+            let launchCount = 0;
+            fireworkTimer = setInterval(() => {
+                const startX = width * (0.1 + Math.random() * 0.8);
+                const startY = height;
+                const targetX = width * (0.05 + Math.random() * 0.9);
+                const targetY = height * (0.08 + Math.random() * 0.45);
+
+                launchSingleBurst(startX, startY, targetX, targetY, colors);
+                launchCount++;
+
+                if (launchCount > 28) {
+                    clearInterval(fireworkTimer);
+                }
+            }, 120);
+
+            // Grand Confetti Shower
+            for (let i = 0; i < 110; i++) {
+                confetti.push({
+                    x: Math.random() * width,
+                    y: -Math.random() * 120,
+                    vx: (Math.random() - 0.5) * 3.5,
+                    vy: Math.random() * 3 + 2,
+                    size: Math.random() * 8 + 4,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    rotation: Math.random() * Math.PI * 2,
+                    vRot: (Math.random() - 0.5) * 0.15
+                });
+            }
+
+            // Reveal victory message
+            setTimeout(() => {
+                victoryOverlay.classList.remove('opacity-0', 'pointer-events-none');
+                victoryBox.classList.remove('scale-90');
+            }, 1000);
+        }
+
+        function createSplash(x, y) {
+            for (let i = 0; i < 20; i++) {
+                splashes.push({
+                    x: x + (Math.random() - 0.5) * 22,
+                    y: y + (Math.random() - 0.5) * 10,
+                    vx: (Math.random() - 0.6) * 7,
+                    vy: -Math.random() * 7 - 2,
+                    radius: Math.random() * 4.5 + 1.5,
+                    alpha: 0.95,
+                    color: Math.random() > 0.3 ? '#05d9e8' : '#ffffff'
+                });
+            }
+        }
+
+        function createRipple(x, y) {
+            waterRipples.push({
+                x: x,
+                y: y + 10,
+                radius: 10,
+                maxRadius: 50 + Math.random() * 25,
+                alpha: 0.85
+            });
+        }
+
+        function drawPoolBackground() {
+            // Water Gradient
+            const grad = ctx.createLinearGradient(0, 0, 0, height);
+            grad.addColorStop(0, '#002845');
+            grad.addColorStop(0.4, '#005f73');
+            grad.addColorStop(0.8, '#0a9396');
+            grad.addColorStop(1, '#94d2bd');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, width, height);
+
+            // Swimming Lane Lines
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.18)';
+            ctx.lineWidth = 3;
+            ctx.setLineDash([15, 15]);
+            ctx.beginPath();
+            ctx.moveTo(0, height * 0.3);
+            ctx.lineTo(width, height * 0.3);
+            ctx.moveTo(0, height * 0.75);
+            ctx.lineTo(width, height * 0.75);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Enhanced Dynamic Waves
+            waveOffset += 0.035;
+            ctx.lineWidth = 2.5;
+            for (let j = 0; j < 4; j++) {
+                ctx.strokeStyle = `rgba(5, 217, 232, ${0.18 + j * 0.08})`;
+                ctx.beginPath();
+                const yPos = height * (0.3 + j * 0.12);
+                for (let x = 0; x < width; x += 10) {
+                    const y = yPos + Math.sin(x * 0.018 + waveOffset + j * 1.2) * (7 + j * 1.5);
+                    if (x === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+            }
+        }
+
+        function drawSwimmer(x, y) {
+            ctx.save();
+            ctx.translate(x, y);
+
+            strokePhase += (progress < targetProgress) ? 0.25 : 0.05;
+            const armAngle = Math.sin(strokePhase) * 0.8;
+
+            // Water Trail
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.28)';
+            ctx.beginPath();
+            ctx.ellipse(-35, 2, 32, 12, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Legs
+            const kickOffset = Math.sin(strokePhase * 2) * 6;
+            ctx.strokeStyle = '#f8fafc';
+            ctx.lineWidth = 7;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.moveTo(-25, -2);
+            ctx.lineTo(-48, -4 + kickOffset);
+            ctx.moveTo(-25, 4);
+            ctx.lineTo(-48, 4 - kickOffset);
+            ctx.stroke();
+
+            // Torso (Dark Blue Swimsuit)
+            ctx.fillStyle = '#1e3a8a';
+            ctx.beginPath();
+            ctx.ellipse(-5, 0, 22, 11, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Swimsuit Pattern
+            ctx.strokeStyle = '#38bdf8';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(-15, -6);
+            ctx.quadraticCurveTo(-5, 0, 5, -6);
+            ctx.moveTo(-15, 6);
+            ctx.quadraticCurveTo(-5, 0, 5, 6);
+            ctx.stroke();
+
+            // Back Arm
+            ctx.strokeStyle = '#f8fafc';
+            ctx.lineWidth = 6;
+            ctx.beginPath();
+            ctx.moveTo(5, -6);
+            ctx.lineTo(15 + Math.cos(armAngle) * 15, -12 + Math.sin(armAngle) * 15);
+            ctx.stroke();
+
+            // Head (Anne-Sophie: Dark Blue Cap, Brown Hair, Round Glasses)
+            ctx.fillStyle = '#f8fafc';
+            ctx.beginPath();
+            ctx.arc(20, -2, 10, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Dark Blue Swim Cap
+            ctx.fillStyle = '#0f172a';
+            ctx.beginPath();
+            ctx.arc(20, -4, 9.5, Math.PI * 0.8, Math.PI * 2.2);
+            ctx.fill();
+
+            // Hair Bun
+            ctx.fillStyle = '#4a2810';
+            ctx.beginPath();
+            ctx.arc(9, -1, 5, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Smile
+            ctx.strokeStyle = '#7c2d12';
+            ctx.lineWidth = 1.8;
+            ctx.beginPath();
+            ctx.arc(23, -1, 3, 0.1, Math.PI * 0.6);
+            ctx.stroke();
+
+            // Glasses
+            ctx.strokeStyle = '#334155';
+            ctx.lineWidth = 1.6;
+            ctx.beginPath();
+            ctx.arc(23, -3, 3.5, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(20, -3);
+            ctx.lineTo(15, -3);
+            ctx.stroke();
+
+            // Front Arm
+            const frontArmAngle = -Math.sin(strokePhase) * 0.8;
+            ctx.strokeStyle = '#f8fafc';
+            ctx.lineWidth = 6;
+            ctx.beginPath();
+            ctx.moveTo(8, 4);
+            ctx.lineTo(25 + Math.cos(frontArmAngle) * 16, 8 + Math.sin(frontArmAngle) * 10);
+            ctx.stroke();
+
+            // Head Splash
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.65)';
+            ctx.beginPath();
+            ctx.arc(26, 4, 4 + Math.sin(strokePhase * 3) * 2, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        // Draw Cake with LIT CANDLES and NO TEXT printed on it
+        function drawCake(x, y) {
+            ctx.save();
+            ctx.translate(x, y);
+
+            const bobbing = Math.sin(waveOffset * 2) * 4;
+            ctx.translate(0, bobbing);
+
+            // Floating Tray
+            ctx.fillStyle = '#0284c7';
+            ctx.beginPath();
+            ctx.ellipse(0, 20, 48, 16, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#38bdf8';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            // Cake Layers (Plain - NO TEXT)
+            ctx.fillStyle = '#fef3c7';
+            ctx.beginPath();
+            ctx.roundRect(-28, -5, 56, 22, 6);
+            ctx.fill();
+
+            ctx.fillStyle = '#f472b6';
+            ctx.beginPath();
+            ctx.roundRect(-28, -12, 56, 12, [6, 6, 0, 0]);
+            ctx.fill();
+
+            // Frosting Drips
+            ctx.fillStyle = '#ffffff';
+            for (let i = -24; i <= 24; i += 12) {
+                ctx.beginPath();
+                ctx.arc(i, -2, 4, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Decorative Pearls on Cake Base
+            ctx.fillStyle = '#fde047';
+            for (let i = -22; i <= 22; i += 8) {
+                ctx.beginPath();
+                ctx.arc(i, 12, 2.5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Lit Candles
+            const candlePositions = [-16, -5, 6, 17];
+            candlePositions.forEach((cx, idx) => {
+                ctx.fillStyle = idx % 2 === 0 ? '#38bdf8' : '#facc15';
+                ctx.fillRect(cx - 2, -26, 4, 14);
+
+                const flicker = Math.sin(waveOffset * 10 + idx) * 2;
+                ctx.fillStyle = '#f97316';
+                ctx.beginPath();
+                ctx.ellipse(cx, -30, 3 + flicker * 0.3, 6 + flicker, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#fef08a';
+                ctx.beginPath();
+                ctx.ellipse(cx, -29, 1.5, 3.5, 0, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            ctx.restore();
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+
+            // 1. Pool Background
+            drawPoolBackground();
+
+            // 2. Update Smooth Progress & 10,000m Countdown
+            if (progress < targetProgress) {
+                progress += (targetProgress - progress) * 0.08;
+                if (targetProgress - progress < 0.001) {
+                    progress = targetProgress;
+                }
+            }
+
+            // Calculate Distance Countdown (10,000m down to 0m)
+            const remainingMeters = Math.max(0, Math.round((1 - progress) * 10000));
+            distanceText.innerText = `${remainingMeters.toLocaleString('de-DE')} m`;
+
+            // Random ambient dolphin spawning
+            if (!isFinished && Math.random() < 0.004) {
+                spawnDolphin();
+            }
+
+            if (progress >= 0.98 && !isFinished) {
+                triggerVictoryFireworks();
+            }
+
+            // 3. Coordinate positions
+            const startX = width * 0.15;
+            const endX = width * 0.76;
+            const swimmerX = startX + (endX - startX) * progress;
+            const laneY = height * 0.52;
+            const cakeX = width * 0.84;
+
+            // 4. Water Ripples
+            for (let i = waterRipples.length - 1; i >= 0; i--) {
+                const r = waterRipples[i];
+                r.radius += 0.8;
+                r.alpha -= 0.015;
+
+                ctx.strokeStyle = `rgba(255, 255, 255, ${Math.max(0, r.alpha)})`;
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.ellipse(r.x, r.y, r.radius, r.radius * 0.35, 0, 0, Math.PI * 2);
+                ctx.stroke();
+
+                if (r.alpha <= 0) waterRipples.splice(i, 1);
+            }
+
+            // 5. Draw Objects
+            drawDolphins();
+            drawCake(cakeX, laneY);
+            drawSwimmer(swimmerX, laneY);
+
+            // 6. Splashes
+            for (let i = splashes.length - 1; i >= 0; i--) {
+                const p = splashes[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.2;
+                p.alpha -= 0.02;
+
+                ctx.fillStyle = p.color;
+                ctx.globalAlpha = Math.max(0, p.alpha);
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fill();
+
+                if (p.alpha <= 0) splashes.splice(i, 1);
+            }
+            ctx.globalAlpha = 1;
+
+            // 7. Firework Rockets
+            for (let i = fireworks.length - 1; i >= 0; i--) {
+                const fw = fireworks[i];
+                fw.x += fw.vx;
+                fw.y += fw.vy;
+
+                ctx.strokeStyle = fw.color;
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(fw.x, fw.y);
+                ctx.lineTo(fw.x - fw.vx * 2.5, fw.y - fw.vy * 2.5);
+                ctx.stroke();
+
+                if (fw.y <= fw.targetY || Math.abs(fw.x - fw.targetX) < 10) {
+                    createBurstParticles(fw.x, fw.y, fw.color);
+                    fireworks.splice(i, 1);
+                }
+            }
+
+            // 8. MASSIVE Explosive Firework Sparks
+            for (let i = fireworkSparks.length - 1; i >= 0; i--) {
+                const sp = fireworkSparks[i];
+                sp.x += sp.vx;
+                sp.y += sp.vy;
+                sp.vy += sp.gravity;
+                sp.alpha -= sp.decay;
+
+                ctx.fillStyle = sp.color;
+                ctx.globalAlpha = Math.max(0, sp.alpha);
+                ctx.beginPath();
+                const currentRadius = sp.sparkle && Math.random() > 0.4 ? sp.radius * 1.6 : sp.radius;
+                ctx.arc(sp.x, sp.y, currentRadius, 0, Math.PI * 2);
+                ctx.fill();
+
+                if (sp.alpha <= 0) fireworkSparks.splice(i, 1);
+            }
+            ctx.globalAlpha = 1;
+
+            // 9. Confetti Shower
+            for (let i = confetti.length - 1; i >= 0; i--) {
+                const c = confetti[i];
+                c.x += c.vx;
+                c.y += c.vy;
+                c.rotation += c.vRot;
+
+                ctx.save();
+                ctx.translate(c.x, c.y);
+                ctx.rotate(c.rotation);
+                ctx.fillStyle = c.color;
+                ctx.fillRect(-c.size / 2, -c.size / 2, c.size, c.size * 0.6);
+                ctx.restore();
+
+                if (c.y > height) confetti.splice(i, 1);
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        window.onload = function() {
+            resizeCanvas();
+            animate();
+        };
+    </script>
+</body>
+</html>
